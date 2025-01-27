@@ -67,17 +67,8 @@ def task_config():
     }
 
 
-def task_pull_fred():
-    """ """
-    file_dep = [
-        "./src/settings.py",
-        "./src/pull_fred.py",
-        "./src/pull_ofr_api_data.py",
-    ]
-    targets = [
-        DATA_DIR / "fred.parquet",
-        DATA_DIR / "ofr_public_repo_data.parquet",
-    ]
+def task_pull_public_repo_data():
+    """Pull public data from FRED and OFR API"""
 
     return {
         "actions": [
@@ -85,8 +76,15 @@ def task_pull_fred():
             "ipython ./src/pull_fred.py",
             "ipython ./src/pull_ofr_api_data.py",
         ],
-        "targets": targets,
-        "file_dep": file_dep,
+        "targets": [
+            DATA_DIR / "fred.parquet",
+            DATA_DIR / "ofr_public_repo_data.parquet",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/pull_fred.py",
+            "./src/pull_ofr_api_data.py",
+        ],
         "clean": [],  # Don't clean these files by default. The ideas
         # is that a data pull might be expensive, so we don't want to
         # redo it unless we really mean it. So, when you run
@@ -96,6 +94,33 @@ def task_pull_fred():
         # Use doit forget --all to redo all tasks. Use doit clean
         # to clean and forget the cheaper tasks.
     }
+
+
+def task_pull_ken_french_data():
+    """Pull public data from FRED and OFR API"""
+
+    return {
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/pull_ken_french_data.py",
+        ],
+        "targets": [
+            DATA_DIR / "25_Portfolios_OP_INV_5x5_daily.parquet",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/pull_ken_french_data.py",
+        ],
+        "clean": [],  # Don't clean these files by default. The ideas
+        # is that a data pull might be expensive, so we don't want to
+        # redo it unless we really mean it. So, when you run
+        # doit clean, all other tasks will have their targets
+        # cleaned and will thus be rerun the next time you call doit.
+        # But this one wont.
+        # Use doit forget --all to redo all tasks. Use doit clean
+        # to clean and forget the cheaper tasks.
+    }
+
 
 
 ##############################$
@@ -131,30 +156,27 @@ def task_pull_fred():
 
 
 def task_summary_stats():
-    """ """
-    file_dep = ["./src/example_table.py"]
-    file_output = [
-        "example_table.tex",
-        "pandas_to_latex_simple_table1.tex",
-    ]
-    targets = [OUTPUT_DIR / file for file in file_output]
+    """Generate table of summary statistics"""
 
     return {
         "actions": [
             "ipython ./src/example_table.py",
             "ipython ./src/pandas_to_latex_demo.py",
         ],
-        "targets": targets,
-        "file_dep": file_dep,
+        "targets": [
+            OUTPUT_DIR / "example_table.tex",
+            OUTPUT_DIR / "pandas_to_latex_simple_table1.tex",
+        ],
+        "file_dep": [
+            "./src/example_table.py",
+            "./src/pandas_to_latex_demo.py",
+        ],
         "clean": True,
     }
 
 
 def task_example_plot():
     """Example plots"""
-    file_dep = [Path("./src") / file for file in ["example_plot.py", "pull_fred.py"]]
-    file_output = ["example_plot.png"]
-    targets = [OUTPUT_DIR / file for file in file_output]
 
     return {
         "actions": [
@@ -162,25 +184,19 @@ def task_example_plot():
             # "time ipython ./src/example_plot.py",
             "ipython ./src/example_plot.py",
         ],
-        "targets": targets,
-        "file_dep": file_dep,
+        "targets": [
+            OUTPUT_DIR / "example_plot.png",
+        ],
+        "file_dep": [
+            "./src/example_plot.py",
+            "./src/pull_fred.py",
+        ],
         "clean": True,
     }
 
 
 def task_chart_repo_rates():
     """Example charts for Chart Book"""
-    file_dep = [
-        "./src/pull_fred.py",
-        "./src/chart_relative_repo_rates.py",
-    ]
-    targets = [
-        DATA_DIR / "repo_public.parquet",
-        DATA_DIR / "repo_public_relative_fed.parquet",
-        OUTPUT_DIR / "repo_rates.html",
-        OUTPUT_DIR / "repo_rates_normalized.html",
-        OUTPUT_DIR / "repo_rates_normalized_w_balance_sheet.html",
-    ]
 
     return {
         "actions": [
@@ -188,8 +204,17 @@ def task_chart_repo_rates():
             # "time ipython ./src/chart_relative_repo_rates.py",
             "ipython ./src/chart_relative_repo_rates.py",
         ],
-        "targets": targets,
-        "file_dep": file_dep,
+        "targets": [
+            DATA_DIR / "repo_public.parquet",
+            DATA_DIR / "repo_public_relative_fed.parquet",
+            OUTPUT_DIR / "repo_rates.html",
+            OUTPUT_DIR / "repo_rates_normalized.html",
+            OUTPUT_DIR / "repo_rates_normalized_w_balance_sheet.html",
+        ],
+        "file_dep": [
+            "./src/pull_fred.py",
+            "./src/chart_relative_repo_rates.py",
+        ],
         "clean": True,
     }
 
@@ -213,6 +238,10 @@ notebook_tasks = {
             OUTPUT_DIR / "repo_rate_spikes_and_relative_reserves_levels.png",
             OUTPUT_DIR / "rates_relative_to_midpoint.png",
         ],
+    },
+    "04_ken_french_data.ipynb": {
+        "file_dep": [],
+        "targets": [],
     },
 }
 
@@ -272,4 +301,3 @@ def task_run_notebooks():
             "clean": True,
         }
 # fmt: on
-
