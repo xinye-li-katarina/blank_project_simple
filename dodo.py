@@ -220,6 +220,10 @@ def task_chart_repo_rates():
 
 
 notebook_tasks = {
+    "index.ipynb": {
+        "file_dep": [],
+        "targets": [],
+    },
     "01_example_notebook_interactive.ipynb": {
         "file_dep": [],
         "targets": [],
