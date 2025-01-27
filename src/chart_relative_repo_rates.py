@@ -147,14 +147,9 @@ df_norm_formatted.index.name = "date"
 
 filepath = DATA_DIR / "repo_public.parquet"
 df_formatted.to_parquet(filepath)
-filepath = DATA_DIR / "repo_public.xlsx"
-df_formatted.to_excel(filepath)
 
 filepath = DATA_DIR / "repo_public_relative_fed.parquet"
 df_norm_formatted.to_parquet(filepath)
-
-filepath = DATA_DIR / "repo_public_relative_fed.xlsx"
-df_norm_formatted.to_excel(filepath)
 
 df = df_formatted.rename(columns=col_name_to_short_name)
 df_norm = df_norm_formatted.rename(columns=col_name_to_short_name)
