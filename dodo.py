@@ -220,17 +220,18 @@ def task_chart_repo_rates():
 
 
 notebook_tasks = {
-    "index.ipynb": {
-        "file_dep": [],
-        "targets": [],
-    },
     "01_example_notebook_interactive.ipynb": {
         "file_dep": [],
-        "targets": [],
+        "targets": [
+            Path("./docs") / "01_example_notebook_interactive.html",
+        ],
     },
     "02_example_with_dependencies.ipynb": {
         "file_dep": ["./src/pull_fred.py"],
-        "targets": [Path(OUTPUT_DIR) / "GDP_graph.png"],
+        "targets": [
+            Path(OUTPUT_DIR) / "GDP_graph.png",
+            Path("./docs") / "02_example_with_dependencies.html",
+        ],
     },
     "03_public_repo_summary_charts.ipynb": {
         "file_dep": [
@@ -241,11 +242,20 @@ notebook_tasks = {
         "targets": [
             OUTPUT_DIR / "repo_rate_spikes_and_relative_reserves_levels.png",
             OUTPUT_DIR / "rates_relative_to_midpoint.png",
+            Path("./docs") / "03_public_repo_summary_charts.html",
         ],
     },
     "04_ken_french_data.ipynb": {
         "file_dep": [],
-        "targets": [],
+        "targets": [
+            Path("./docs") / "04_ken_french_data.html",
+        ],
+    },
+    "index.ipynb": {
+        "file_dep": [],
+        "targets": [
+            Path("./docs") / "index.html",
+        ],
     },
 }
 
@@ -287,6 +297,11 @@ def task_run_notebooks():
                 copy_file(
                     Path("./src") / f"{notebook_name}.ipynb",
                     OUTPUT_DIR / f"{notebook_name}.ipynb",
+                    mkdir=True,
+                ),
+                copy_file(
+                    OUTPUT_DIR / f"{notebook_name}.html",
+                    Path("./docs") / f"{notebook_name}.html",
                     mkdir=True,
                 ),
                 jupyter_clear_output(notebook_name),
